@@ -1,14 +1,30 @@
-const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+import express from 'express';
+import { config } from 'dotenv';
+import { createProxyMiddleware } from 'http-proxy-middleware'; 
+
+config();
 
 const app = express();
 
-// Proxy routes
-app.use('/users', createProxyMiddleware({ target: 'http://user-service-vm:3001', changeOrigin: true }));
-app.use('/products', createProxyMiddleware({ target: 'http://product-service-vm:3002', changeOrigin: true }));
-app.use('/orders', createProxyMiddleware({ target: 'http://order-service-vm:3003', changeOrigin: true }));
+// Middleware to proxy requests to the User Service
+app.use('/users', createProxyMiddleware({
+  target: process.env.USER_SERVICE_URL, // Redirect to User Service
+  changeOrigin: true,
+}));
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`API Gateway running on port ${PORT}`);
+
+app.use('/products', createProxyMiddleware({
+  target: process.env.PRODUCT_SERVICE_URL, 
+  changeOrigin: true,
+}));
+
+
+app.use('/orders', createProxyMiddleware({
+  target: process.env.ORDER_SERVICE_URL, 
+  changeOrigin: true,
+}));
+
+
+app.listen(3000, () => {
+  console.log('API Gateway is running on port 3000');
 });
