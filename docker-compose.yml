@@ -1,0 +1,59 @@
+services:
+  user-service:
+    build:
+      context: ./user-service
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=user_service_db
+      - DB_PORT=3306
+    depends_on:
+      - mysql
+
+  prodect-service:
+    build:
+      context: ./prodect-service
+    ports:
+      - "3002:3002"
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=product_service_db
+      - DB_PORT=3306
+    depends_on:
+      - mysql
+
+  order-service:
+    build:
+      context: ./order-service
+    ports:
+      - "3003:3003"
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=order_service_db
+      - DB_PORT=3306
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d"
+    ports:
+      - "3306:3306"
+
+
+
+volumes:
+  mysql-data:

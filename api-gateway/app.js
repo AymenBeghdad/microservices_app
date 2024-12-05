@@ -1,30 +1,20 @@
-import express from 'express';
-import { config } from 'dotenv';
-import { createProxyMiddleware } from 'http-proxy-middleware'; 
-
-config();
+const express = require("express");
+const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const app = express();
 
-// Middleware to proxy requests to the User Service
-app.use('/users', createProxyMiddleware({
-  target: process.env.USER_SERVICE_URL, // Redirect to User Service
-  changeOrigin: true,
-}));
+// Proxy middleware configurations
+app.use("/users", createProxyMiddleware({ target: "http://192.168.56.101:3001/users", changeOrigin: true }));
+app.use("/products", createProxyMiddleware({ target: "http://localhost:3002/products", changeOrigin: true }));
+app.use("/orders", createProxyMiddleware({ target: "http://localhost:3003/orders", changeOrigin: true }));
 
+// Catch-all route for undefined endpoints
+app.use((req, res) => {
+  res.status(404).send("API endpoint not found.");
+});
 
-app.use('/products', createProxyMiddleware({
-  target: process.env.PRODUCT_SERVICE_URL, 
-  changeOrigin: true,
-}));
-
-
-app.use('/orders', createProxyMiddleware({
-  target: process.env.ORDER_SERVICE_URL, 
-  changeOrigin: true,
-}));
-
-
-app.listen(3000, () => {
-  console.log('API Gateway is running on port 3000');
+// Start API Gateway
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`API Gateway running on port ${PORT}`);
 });
